@@ -5,10 +5,32 @@
 <h1>Stack Guesser</h1>
 <h3>Can you find the accepted answer?</h3>
 </center>
+
+<script>
+function checkAnswer(buttonPressed) {
+  document.getElementById(buttonPressed).style.backgroundColor="#660000";
+  document.getElementById(buttonPressed).style.color="#FFFFFF";
+  document.getElementById("answer2").style.backgroundColor="#006600";
+  document.getElementById("answer2").style.color="#FFFFFF";
+  
+  document.getElementById("answer1").disabled=true;
+  document.getElementById("answer2").disabled=true;
+  document.getElementById("answer3").disabled=true;
+  document.getElementById("answer4").disabled=true;
+}
+</script>
+
 </head>
 
 <body>
-Hello world!
+
+<p id="question">This is the question!</p>
+
+<button type="button" id="answer1" onclick="checkAnswer(this.id)">Answer 1</button><br />
+<button type="button" id="answer2" onclick="checkAnswer(this.id)">Answer 2</button><br />
+<button type="button" id="answer3" onclick="checkAnswer(this.id)">Answer 3</button><br />
+<button type="button" id="answer4" onclick="checkAnswer(this.id)">Answer 4</button><br />
+
 
 </body>
 </html>
