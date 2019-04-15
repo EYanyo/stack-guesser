@@ -7,30 +7,67 @@
 </center>
 
 <script>
+var question = {
+  text: "What is 1+1?",
+  answers: ["1","2","3","4"],
+  correctAnswer: 1
+}
+
 function checkAnswer(buttonPressed) {
   document.getElementById(buttonPressed).style.backgroundColor="#660000";
   document.getElementById(buttonPressed).style.color="#FFFFFF";
-  document.getElementById("answer2").style.backgroundColor="#006600";
-  document.getElementById("answer2").style.color="#FFFFFF";
+  document.getElementById(question.correctAnswer).style.backgroundColor="#006600";
+  document.getElementById(question.correctAnswer).style.color="#FFFFFF";
   
-  document.getElementById("answer1").disabled=true;
-  document.getElementById("answer2").disabled=true;
-  document.getElementById("answer3").disabled=true;
-  document.getElementById("answer4").disabled=true;
+  for (var i = 0; i < 4; i++) {
+  document.getElementById(i).disabled=true;
+  }
 }
+
+function shuffleAnswers() {
+    var array=question.answers;
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+        
+        if (question.correctAnswer===i){
+          question.correctAnswer=j;
+        }
+        else if (question.correctAnswer===j){
+          question.correctAnswer=i;
+        }
+    }
+}
+
+function initialize() {
+  shuffleAnswers(question);
+  
+  for (var i = 0; i < 4; i++) {
+    document.getElementById(i).innerHTML=question.answers[i];
+    document.getElementById(i).style.color="#000000";
+    document.getElementById(i).style.backgroundColor="#FCFCFC";
+    document.getElementById(i).disabled=false;
+  };
+  
+  document.getElementById("question").innerHTML=question.text;
+}
+
 </script>
 
 </head>
 
-<body>
+<body onload="initialize()">
 
-<p id="question">This is the question!</p>
+<p id="question"></p>
 
-<button type="button" id="answer1" onclick="checkAnswer(this.id)">Answer 1</button><br />
-<button type="button" id="answer2" onclick="checkAnswer(this.id)">Answer 2</button><br />
-<button type="button" id="answer3" onclick="checkAnswer(this.id)">Answer 3</button><br />
-<button type="button" id="answer4" onclick="checkAnswer(this.id)">Answer 4</button><br />
-
+<button type="button" id="0" onclick="checkAnswer(this.id)"></button><br />
+<button type="button" id="1" onclick="checkAnswer(this.id)"></button><br />
+<button type="button" id="2" onclick="checkAnswer(this.id)"></button><br />
+<button type="button" id="3" onclick="checkAnswer(this.id)"></button><br />
+<br />
+<button type="button" onclick="initialize()">Reset</button>
 
 </body>
 </html>
