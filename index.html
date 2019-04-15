@@ -42,16 +42,40 @@ function shuffleAnswers() {
 }
 
 function initialize() {
-  shuffleAnswers(question);
+  var request = new XMLHttpRequest();
+  request.open('GET', 'http://api.stackexchange.com/2.2/questions/17925577?order=desc&sort=activity&site=stackoverflow&filter=!-*jbN-o8P3E5', true)
+  request.onload = function() {
+    // Begin accessing JSON data here
+    var data = JSON.parse(this.response);
+    document.getElementById("questionTitle").innerHTML=data.items[0].title;
+    document.getElementById("questionText").innerHTML=data.items[0].body;
+    
+    for (var i = 0; i < data.items[0].answers.length; i++){
+      question.answers[i]=data.items[0].answers[i].body
+      if (data.items[0].answers[i].is_accepted==true){
+        question.correctAnswer=i;
+      }
+    }
+    shuffleAnswers(question);
+    for (var i = 0; i < 4; i++) {
+      document.getElementById(i).innerHTML=question.answers[i];
+      document.getElementById(i).style.color="#000000";
+      document.getElementById(i).style.backgroundColor="#FCFCFC";
+      document.getElementById(i).disabled=false;
+    };
+  }
+  request.send();
   
-  for (var i = 0; i < 4; i++) {
-    document.getElementById(i).innerHTML=question.answers[i];
-    document.getElementById(i).style.color="#000000";
-    document.getElementById(i).style.backgroundColor="#FCFCFC";
-    document.getElementById(i).disabled=false;
-  };
+  //shuffleAnswers(question);
   
-  document.getElementById("question").innerHTML=question.text;
+  //for (var i = 0; i < 4; i++) {
+  //  document.getElementById(i).innerHTML=question.answers[i];
+  //  document.getElementById(i).style.color="#000000";
+  //  document.getElementById(i).style.backgroundColor="#FCFCFC";
+  //  document.getElementById(i).disabled=false;
+  //};
+  
+  //document.getElementById("questionText").innerHTML=question.text;
 }
 
 </script>
@@ -60,7 +84,8 @@ function initialize() {
 
 <body onload="initialize()">
 
-<p id="question"></p>
+<h2><p id="questionTitle"></p></h2>
+<p id="questionText"></p>
 
 <button type="button" id="0" onclick="checkAnswer(this.id)"></button><br />
 <button type="button" id="1" onclick="checkAnswer(this.id)"></button><br />
