@@ -13,14 +13,20 @@ var question = {
   correctAnswer: 1
 }
 
+var questionArray = [];
+
 function checkAnswer(buttonPressed) {
   document.getElementById(buttonPressed).style.backgroundColor="#660000";
   document.getElementById(buttonPressed).style.color="#FFFFFF";
   document.getElementById(question.correctAnswer).style.backgroundColor="#006600";
   document.getElementById(question.correctAnswer).style.color="#FFFFFF";
   
-  for (var i = 0; i < 4; i++) {
+  /*for (var i = 0; i < 4; i++) {
   document.getElementById(i).disabled=true;
+  }*/
+  
+  for (var i = 0; i < question.answers.length; i++) {
+    document.getElementById("answer" + i).disabled=true;
   }
 }
 
@@ -32,17 +38,17 @@ function shuffleAnswers() {
         array[i] = array[j];
         array[j] = temp;
         
-        if (question.correctAnswer===i){
+        /*if (question.correctAnswer===i){
           question.correctAnswer=j;
         }
         else if (question.correctAnswer===j){
           question.correctAnswer=i;
-        }
+        }*/
     }
 }
 
 function initialize() {
-  var request = new XMLHttpRequest();
+  /*var request = new XMLHttpRequest();
   request.open('GET', 'http://api.stackexchange.com/2.2/questions/17925577?order=desc&sort=activity&site=stackoverflow&filter=!-*jbN-o8P3E5', true)
   request.onload = function() {
     // Begin accessing JSON data here
@@ -64,27 +70,97 @@ function initialize() {
       document.getElementById(i).disabled=false;
     };
   }
+  request.send();*/
+  
+  //populateQuestionArray();
+  document.body.innerHTML = "";
+  
+  for (var i = 0; i < questionArray.length; i++){
+    var btn = document.createElement("BUTTON");
+    btn.innerHTML=questionArray[i].title;
+    //btn.id=("question" + i);
+    btn.id=i;
+    //btn.onclick=getQuestion(i);
+    btn.onclick=function(){
+      getQuestion(this.id);
+    }
+    document.body.appendChild(btn);
+    
+    var br = document.createElement("BR");
+    document.body.appendChild(br);
+    //document.getElementById(i).innerHTML=questionArray[i].title;
+  }
+}
+
+function populateQuestionArray(){
+  var request = new XMLHttpRequest();
+  request.open('GET', 'http://api.stackexchange.com/2.2/questions?pagesize=100&order=desc&sort=activity&site=stackoverflow&filter=!-MOiNm40F1Y0EbU.woOzZcyaCgGlrU3Gy', true)
+  request.onload = function() {
+    // Begin accessing JSON data here
+    var data = JSON.parse(this.response);
+    var questionIndex=0;
+    
+    for (var i = 0; i < data.items.length; i++){
+        if ((data.items[i].accepted_answer_id != null)&(data.items[i].answer_count > 1)){
+          questionArray[questionIndex]=data.items[i];
+          questionIndex++;
+        }
+      }
+    }
   request.send();
+}
+
+function getQuestion(questionIndex){
+  document.body.innerHTML = "";
   
-  //shuffleAnswers(question);
+  question = questionArray[questionIndex];
+  shuffleAnswers();
   
-  //for (var i = 0; i < 4; i++) {
-  //  document.getElementById(i).innerHTML=question.answers[i];
-  //  document.getElementById(i).style.color="#000000";
-  //  document.getElementById(i).style.backgroundColor="#FCFCFC";
-  //  document.getElementById(i).disabled=false;
-  //};
+  var title = document.createElement("H2");
+  //title.innerHTML=questionArray[questionIndex].title;
+  title.innerHTML=question.title;
+  document.body.appendChild(title);
   
-  //document.getElementById("questionText").innerHTML=question.text;
+  var br = document.createElement("BR");
+  document.body.appendChild(br);
+  
+  var text = document.createElement("P");
+  //text.innerHTML=questionArray[questionIndex].body;
+  text.innerHTML=question.body;
+  document.body.appendChild(text);
+  
+  var br = document.createElement("BR");
+  document.body.appendChild(br);
+  
+  //for (var i = 0; i < questionArray[questionIndex].answers.length; i++){
+  for (var i = 0; i < question.answers.length; i++){
+    var btn = document.createElement("BUTTON");
+    //btn.innerHTML=questionArray[questionIndex].answers[i].body;
+    btn.innerHTML=question.answers[i].body;
+    btn.id=("answer" + i);
+    //btn.onclick=("checkAnswer(answer" + i + ")");
+    btn.onclick=function(){
+      checkAnswer(this.id);
+    }
+    document.body.appendChild(btn);
+    
+    var br = document.createElement("BR");
+    document.body.appendChild(br);
+    
+    //if (questionArray[questionIndex].answers[i].is_accepted === true){
+    if (question.answers[i].is_accepted === true){
+      question.correctAnswer=("answer" + i);
+    }
+  }
 }
 
 </script>
 
 </head>
 
-<body onload="initialize()">
+<body onload="populateQuestionArray()">
 
-<h2><p id="questionTitle"></p></h2>
+<!--<h2><p id="questionTitle"></p></h2>
 <p id="questionText"></p>
 
 <button type="button" id="0" onclick="checkAnswer(this.id)"></button><br />
@@ -92,7 +168,9 @@ function initialize() {
 <button type="button" id="2" onclick="checkAnswer(this.id)"></button><br />
 <button type="button" id="3" onclick="checkAnswer(this.id)"></button><br />
 <br />
-<button type="button" onclick="initialize()">Reset</button>
+<button type="button" onclick="initialize()">Reset</button>-->
+
+<button type="button" onclick="initialize()">Start</button>
 
 </body>
 </html>
