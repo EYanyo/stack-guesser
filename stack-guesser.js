@@ -35,23 +35,47 @@ function populateQuestionArray(){
 	
 	//If tagString not set from a previous run, look for a tag to filter by
 	if (tagString === ""){ 
-		var tag=document.getElementById("tagField").value;
+		var tags=document.getElementById("tagField").value;
 		
 		//If there's anything in the tagField, validate that it's a real tag per the Stack Exchange API
-		if (tag != null){
+		if (tags != null){
 			var request = new XMLHttpRequest();
-		  	var requestString = ("http://api.stackexchange.com/2.2/tags/" + tag + "/info?order=desc&sort=popular&site=stackoverflow");
+		  	var requestString = ("http://api.stackexchange.com/2.2/tags/" + tags + "/info?order=desc&sort=popular&site=stackoverflow");
 		  	request.open('GET', requestString, false);
 		  	request.onload = function() {
 		  		//Process JSON response
 		  		var data = JSON.parse(this.response);
+		  		var count = 0;
 		  		
-		  		//If data was returned when getting info on the tag
-		  		if (data.items.length > 0){
-		  			tagString = ("&tagged=" + tag);
+		  		//Basic error handling
+		  		if (data.error_id != null){
+		  			window.alert("Error retrieving tags. Showing all questions.");
 		  		}
 		  		else {
-		  			window.alert("Invalid tag. Showing all questions.")
+			  		//If data was returned when getting info on the tag
+			  		if (data.items.length > 5){ //Questions API can't handle more than 5 tags
+			  			window.alert("Too many tags entered.  Showing all questions.");
+			  		}
+			  		else {
+			  			for (var i = 0; i < data.items.length ; i++){
+			  				if (tagString === ""){
+			  					tagString = ("&tagged=" + data.items[i].name);
+			  				}
+			  				else {
+			  					tagString += (";" + data.items[i].name);
+			  				}
+			  				
+			  				count += data.items[i].count;
+			  			}
+			  		}
+			  		
+			  		if (tagString === ""){
+			  			window.alert("No valid tags found. Showing all questions.");
+			  		}
+			  		else if (count < 10){
+			  			window.alert("Not enough questions within the given tag(s) to play. Showing all questions.");
+			  			tagString = "";
+			  		}
 		  		}
 		  	}
 		  	request.send();
@@ -68,6 +92,12 @@ function populateQuestionArray(){
 	    //Parse JSON response
 	    var data = JSON.parse(this.response);
 	    
+	    //Handle errors
+	    if (data.error_id != null){
+		 	window.alert("Error retrieving questions. Please try again");
+		 	return;
+		 }
+		 
 	    //Iterate through all the returned questions, or until we get 10 questions, whichever comes first
 	    for (var i = 0; ((i < data.items.length) && (questionIndex < 10)); i++){
 	    
@@ -96,11 +126,18 @@ function populateQuestionArray(){
  *   emy 04/2019 - Created
  */
 function initialize() {
+
+	//Make sure we have enough questions loaded
+	if (questionArray.length < 10) {
+		window.alert("Questions not loaded. Please try the request again.");
+		return;
+	}
+
   document.getElementById("mainBody").innerHTML = ""; //Clear main body of page
   
   //Once all 10 questions have been answered
   if (numAnswered === 10){
-  	window.alert("Congratulations, you've guessed answers for all the questions!  Your final score is: " + score + "/10.  Click Play Again to try again with a new set of questions.")
+  	window.alert("Congratulations, you've guessed answers for all the questions!  Your final score is: " + score + "/10.  Click Play Again to try again with a new set of questions.");
   	
   	//Add a new button allowing the user to play again
   	var replayBtn = document.createElement("BUTTON");
