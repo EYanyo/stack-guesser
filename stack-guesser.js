@@ -1,7 +1,19 @@
+/******************************************************************************
+ * Stack Guesser
+ * AUTHOR:  Ethan Yanyo
+ * PURPOSE: This is a small browser-based guessing game.  The user is presented
+ *          with a list of 10 questions from Stack Overflow, and selecting a 
+ *          question brings up the answers given to that question.  The goal of
+ *          the game is to guess the answer that was accepted for each question. 
+ ******************************************************************************
+ */
+
+
 //Global variables to hold list of questions and current question
 var questionArray = [];
 var question = {};
 
+//Global variables to maintain state of query and game progress
 var page = 1;
 var score = 0;
 var numAnswered = 0;
