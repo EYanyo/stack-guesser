@@ -1,19 +1,20 @@
 <html>
 <head>
-
-<center>
-<h1>Stack Guesser</h1>
-<h3>Can you find the accepted answer?</h3>
-</center>
-
 <script type="text/javascript" src="stack-guesser.js"></script>
-
 </head>
 
 <body>
-<div id="mainBody">
-  <button type="button" onclick="populateQuestionArray(); initialize()">Start</button>
-</div>
+  <center>
+    <h1>Stack Guesser</h1>
+    <h3>Can you find the accepted answer?</h3>
+  </center>
+  
+  <p id="scoreField"></p>
 
+  <div id="mainBody">
+    <p>Tag: <input type="text" id="tagField" /></p>
+    <button type="button" onclick="populateQuestionArray(); initialize()">Start</button>
+  </div>
 </body>
+
 </html>

@@ -1,15 +1,38 @@
 //Global variables to hold list of questions and current question
 var questionArray = [];
 var question = {};
+
 var page = 1;
+var score = 0;
+var numAnswered = 0;
 
 
 function populateQuestionArray(){
+	var tag=document.getElementById("tagField").value;
+	var tagString="";
+	
+	if (tag != null){
+		var request = new XMLHttpRequest();
+	  	var requestString = ("http://api.stackexchange.com/2.2/tags/" + tag + "/info?order=desc&sort=popular&site=stackoverflow");
+	  	request.open('GET', requestString, false);
+	  	request.onload = function() {
+	  		var data = JSON.parse(this.response);
+	  		
+	  		if (data.items.length > 0){
+	  			tagString = ("&tagged=" + tag);
+	  		}
+	  		else {
+	  			window.alert("Invalid tag. Showing all questions.")
+	  		}
+	  	}
+	  	request.send();
+	}
+
 	var questionIndex=0;
 	
 	while (questionIndex < 10){
 	  var request = new XMLHttpRequest();
-	  var requestString = ("http://api.stackexchange.com/2.2/questions?page=" + page + "&pagesize=100&order=desc&sort=activity&site=stackoverflow&filter=!-MOiNm40F1Y0EbU.woOzZcyaCgGlrU3Gy");
+	  var requestString = ("http://api.stackexchange.com/2.2/questions?page=" + page + "&pagesize=100&order=desc&sort=activity" + tagString + "&site=stackoverflow&filter=!-MOiNm40F1Y0EbU.woOzZcyaCgGlrU3Gy");
 	  request.open('GET', requestString, false);
 	  request.onload = function() {
 	    // Begin accessing JSON data here
@@ -32,6 +55,23 @@ function populateQuestionArray(){
 function initialize() {
   document.getElementById("mainBody").innerHTML = "";
   
+  if (numAnswered === 10){
+  	window.alert("Congratulations, you've guessed answers for all the questions!  Your final score is: " + score + "/10.  Click Play Again to try again with a new set of questions.")
+  	
+  	var replayBtn = document.createElement("BUTTON");
+  	replayBtn.innerHTML="Play Again";
+  	replayBtn.onclick=function(){
+  		restart();
+  	}
+  	document.getElementById("mainBody").appendChild(replayBtn);
+  	
+  	var br = document.createElement("BR");
+   document.getElementById("mainBody").appendChild(br);
+   
+   var br = document.createElement("BR");
+   document.getElementById("mainBody").appendChild(br);
+  }
+  
   for (var i = 0; i < questionArray.length; i++){
     var btn = document.createElement("BUTTON");
     btn.innerHTML=questionArray[i].title;
@@ -47,6 +87,8 @@ function initialize() {
     var br = document.createElement("BR");
     document.getElementById("mainBody").appendChild(br);
   }
+  
+  document.getElementById("scoreField").innerHTML=("Score: " + score);
 }
 
 
@@ -111,14 +153,41 @@ function shuffleAnswers() {
 
 
 function checkAnswer(buttonPressed) {
-  document.getElementById(buttonPressed).style.backgroundColor="#660000";
-  document.getElementById(buttonPressed).style.color="#FFFFFF";
+	if (buttonPressed === question.correctAnswer){
+		window.alert("Correct!");
+		
+		score++;
+	}
+	else {
+		window.alert("Incorrect :(");
+		
+		//If they answered wrong, highlight the incorrect guess in red
+		document.getElementById(buttonPressed).style.backgroundColor="#660000";
+  		document.getElementById(buttonPressed).style.color="#FFFFFF";
+	}
+  
+  //Regardless, highlight the correct answer in green
   document.getElementById(question.correctAnswer).style.backgroundColor="#006600";
   document.getElementById(question.correctAnswer).style.color="#FFFFFF";
   
+  //disable all answer buttons once one has been guessed
   for (var i = 0; i < question.answers.length; i++) {
     document.getElementById("answer" + i).disabled=true;
   }
   
   question.answered=true;
+  numAnswered++;
+  document.getElementById("scoreField").innerHTML=("Score: " + score);
+}
+
+function restart(){
+	questionArray = [];
+	question = {};
+	score = 0;
+	numAnswered = 0;
+	
+	document.getElementById("scoreField").innerHTML="";
+	
+	populateQuestionArray();
+	initialize();
 }
