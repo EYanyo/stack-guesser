@@ -28,6 +28,8 @@ function checkAnswer(buttonPressed) {
   for (var i = 0; i < question.answers.length; i++) {
     document.getElementById("answer" + i).disabled=true;
   }
+  
+  question.answered=true;
 }
 
 function shuffleAnswers() {
@@ -73,7 +75,8 @@ function initialize() {
   request.send();*/
   
   //populateQuestionArray();
-  document.body.innerHTML = "";
+  
+  document.getElementById("mainBody").innerHTML = "";
   
   for (var i = 0; i < questionArray.length; i++){
     var btn = document.createElement("BUTTON");
@@ -84,10 +87,13 @@ function initialize() {
     btn.onclick=function(){
       getQuestion(this.id);
     }
-    document.body.appendChild(btn);
+    if (questionArray[i].answered===true){
+      btn.disabled=true;
+    }
+    document.getElementById("mainBody").appendChild(btn);
     
     var br = document.createElement("BR");
-    document.body.appendChild(br);
+    document.getElementById("mainBody").appendChild(br);
     //document.getElementById(i).innerHTML=questionArray[i].title;
   }
 }
@@ -111,7 +117,17 @@ function populateQuestionArray(){
 }
 
 function getQuestion(questionIndex){
-  document.body.innerHTML = "";
+  document.getElementById("mainBody").innerHTML = "";
+  
+  var backButton = document.createElement("BUTTON");
+  backButton.innerHTML = "Back";
+  backButton.onclick=function(){
+    initialize();
+  }
+  document.getElementById("mainBody").appendChild(backButton);
+  
+  var br = document.createElement("BR");
+  document.getElementById("mainBody").appendChild(br);
   
   question = questionArray[questionIndex];
   shuffleAnswers();
@@ -119,18 +135,18 @@ function getQuestion(questionIndex){
   var title = document.createElement("H2");
   //title.innerHTML=questionArray[questionIndex].title;
   title.innerHTML=question.title;
-  document.body.appendChild(title);
+  document.getElementById("mainBody").appendChild(title);
   
   var br = document.createElement("BR");
-  document.body.appendChild(br);
+  document.getElementById("mainBody").appendChild(br);
   
   var text = document.createElement("P");
   //text.innerHTML=questionArray[questionIndex].body;
   text.innerHTML=question.body;
-  document.body.appendChild(text);
+  document.getElementById("mainBody").appendChild(text);
   
   var br = document.createElement("BR");
-  document.body.appendChild(br);
+  document.getElementById("mainBody").appendChild(br);
   
   //for (var i = 0; i < questionArray[questionIndex].answers.length; i++){
   for (var i = 0; i < question.answers.length; i++){
@@ -142,10 +158,10 @@ function getQuestion(questionIndex){
     btn.onclick=function(){
       checkAnswer(this.id);
     }
-    document.body.appendChild(btn);
+    document.getElementById("mainBody").appendChild(btn);
     
     var br = document.createElement("BR");
-    document.body.appendChild(br);
+    document.getElementById("mainBody").appendChild(br);
     
     //if (questionArray[questionIndex].answers[i].is_accepted === true){
     if (question.answers[i].is_accepted === true){
@@ -159,18 +175,9 @@ function getQuestion(questionIndex){
 </head>
 
 <body onload="populateQuestionArray()">
-
-<!--<h2><p id="questionTitle"></p></h2>
-<p id="questionText"></p>
-
-<button type="button" id="0" onclick="checkAnswer(this.id)"></button><br />
-<button type="button" id="1" onclick="checkAnswer(this.id)"></button><br />
-<button type="button" id="2" onclick="checkAnswer(this.id)"></button><br />
-<button type="button" id="3" onclick="checkAnswer(this.id)"></button><br />
-<br />
-<button type="button" onclick="initialize()">Reset</button>-->
-
-<button type="button" onclick="initialize()">Start</button>
+<div id="mainBody">
+  <button type="button" onclick="initialize()">Start</button>
+</div>
 
 </body>
 </html>
