@@ -38,7 +38,7 @@ function populateQuestionArray(){
 		var tags=document.getElementById("tagField").value;
 		
 		//If there's anything in the tagField, validate that it's a real tag per the Stack Exchange API
-		if (tags != null){
+		if (tags != ""){
 			var request = new XMLHttpRequest();
 		  	var requestString = ("http://api.stackexchange.com/2.2/tags/" + tags + "/info?order=desc&sort=popular&site=stackoverflow");
 		  	request.open('GET', requestString, false);
@@ -48,7 +48,7 @@ function populateQuestionArray(){
 		  		var count = 0;
 		  		
 		  		//Basic error handling
-		  		if (data.error_id != null){
+		  		if (data.error_id != ""){
 		  			window.alert("Error retrieving tags. Showing all questions.");
 		  		}
 		  		else {
@@ -82,9 +82,11 @@ function populateQuestionArray(){
 		}
 	}
 
-	var questionIndex=0; //keep track of how many questions we're adding
+	var questionIndex = 0; //keep track of how many questions we're adding
+	var pageLimit = page + 10; //if we don't find enough questions in 10 pages, quit out so we don't use up our quota.
+	var error = "";
 	
-	while (questionIndex < 10){
+	while ((questionIndex < 10) && (page < pageLimit) && (error === "")){
 	  var request = new XMLHttpRequest();
 	  var requestString = ("http://api.stackexchange.com/2.2/questions?page=" + page + "&pagesize=100&order=desc&sort=activity" + tagString + "&site=stackoverflow&filter=!-MOiNm40F1Y0EbU.woOzZcyaCgGlrU3Gy");
 	  request.open('GET', requestString, false);
@@ -93,8 +95,9 @@ function populateQuestionArray(){
 	    var data = JSON.parse(this.response);
 	    
 	    //Handle errors
-	    if (data.error_id != null){
-		 	window.alert("Error retrieving questions. Please try again");
+	    if (data.error_id != ""){
+		 	window.alert("Error retrieving questions. Please try again.");
+		 	error = 1;
 		 	return;
 		 }
 		 
@@ -157,6 +160,7 @@ function initialize() {
     var btn = document.createElement("BUTTON");
     btn.innerHTML=questionArray[i].title;
     btn.id=i;
+    btn.className="questionButton";
     btn.onclick=function(){
       getQuestion(this.id);
     }
@@ -195,6 +199,7 @@ function getQuestion(questionIndex){
   //Add a back button to go back to the list of questions
   var backButton = document.createElement("BUTTON");
   backButton.innerHTML = "Back";
+  backButton.className="backButton";
   backButton.onclick=function(){
     initialize();
   }
@@ -209,6 +214,7 @@ function getQuestion(questionIndex){
   //Question Title
   var title = document.createElement("H2");
   title.innerHTML=question.title;
+  title.className="center";
   document.getElementById("mainBody").appendChild(title);
   
   addLineBreak();
@@ -216,6 +222,7 @@ function getQuestion(questionIndex){
   //Question Body (text of question)
   var text = document.createElement("P");
   text.innerHTML=question.body;
+  text.className="questionText";
   document.getElementById("mainBody").appendChild(text);
   
   addLineBreak();
