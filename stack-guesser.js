@@ -48,7 +48,7 @@ function populateQuestionArray(){
 		  		var count = 0;
 		  		
 		  		//Basic error handling
-		  		if (data.error_id != ""){
+		  		if (request.status >= 400){
 		  			window.alert("Error retrieving tags. Showing all questions.");
 		  		}
 		  		else {
@@ -95,7 +95,7 @@ function populateQuestionArray(){
 	    var data = JSON.parse(this.response);
 	    
 	    //Handle errors
-	    if (data.error_id != ""){
+	    if (request.status >= 400){
 		 	window.alert("Error retrieving questions. Please try again.");
 		 	error = 1;
 		 	return;
@@ -145,6 +145,7 @@ function initialize() {
   	//Add a new button allowing the user to play again
   	var replayBtn = document.createElement("BUTTON");
   	replayBtn.innerHTML="Play Again";
+  	replayBtn.className="replayButton";
   	replayBtn.onclick=function(){
   		restart();
   	}
@@ -232,6 +233,7 @@ function getQuestion(questionIndex){
     var btn = document.createElement("BUTTON");
     btn.innerHTML=question.answers[i].body;
     btn.id=("answer" + i);
+    btn.className="answerButton";
     btn.onclick=function(){
       checkAnswer(this.id);
     }
